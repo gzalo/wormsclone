@@ -55,3 +55,18 @@ bool KeyStatus::isRope() const {
 void KeyStatus::setRope(bool _rope) {
     rope = _rope;
 }
+
+int KeyStatus::getMovementType() const {
+    if (isUp() && isLeft()) return 1;
+    if (isUp() && !isLeft() && !isRight()) return 2;
+    if (isUp() && isRight()) return 3;
+
+    if (!isUp() && !isDown() && isLeft()) return 4;
+    if (!isUp() && !isDown() && isRight()) return 6;
+
+    if (isDown() && isLeft()) return 7;
+    if (isDown() && !isLeft() && !isRight()) return 8;
+    if (isDown() && isRight()) return 9;
+
+    return 5;
+}

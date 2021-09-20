@@ -25,7 +25,7 @@ tuple<const SDL_Surface *, GLuint> loadImage(const string &filename) {
     return {loadedImage, imgId};
 }
 
-void updateImage(int imgId, const SDL_Surface *img) {
+void updateImage(GLuint imgId, const SDL_Surface *img) {
     glBindTexture(GL_TEXTURE_2D, imgId);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -45,7 +45,7 @@ void setPixel(const SDL_Surface *surface, int x, int y, unsigned int color) {
     *p = color;
 }
 
-int drawRect(int img, int x, int y, int w, int h) {
+int drawRect(GLuint img, int x, int y, int w, int h) {
     auto x0 = (GLdouble) x;
     auto y0 = (GLdouble) y;
     auto x1 = (GLdouble) (x + w);

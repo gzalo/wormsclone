@@ -4,6 +4,7 @@
 #include "graphics.h"
 #include "Character.h"
 #include "Bullet.h"
+#include "CollisionManager.h"
 #include <list>
 #include <vector>
 #include <map>
@@ -21,6 +22,7 @@ private:
     bool frontImgNeedsUpdate = true;
     list <Bullet> bullets;
     vector<Character> characters;
+    CollisionManager collisionManager = CollisionManager(characters);
     const SDL_Surface *front;
     const int width;
     SDL_Window *window;
@@ -43,6 +45,8 @@ private:
     void drawCharacter(const Character &character) const;
 
     void updateBullets();
+
+    void fireBullets(Character &character);
 };
 
 #endif

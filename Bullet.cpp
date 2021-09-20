@@ -1,6 +1,6 @@
 #include "Bullet.h"
 
-bool Bullet::update(const SDL_Surface *front, bool &updated, vector<Character> &characters) {
+bool Bullet::update(const SDL_Surface *front, bool &updated) {
     auto steps = (int) max(abs(vx), abs(vy));
 
     for (int i = 0; i < steps; i++) {
@@ -14,10 +14,8 @@ bool Bullet::update(const SDL_Surface *front, bool &updated, vector<Character> &
             return true;
         }
 
-        for (int char_idx = 0; char_idx < characters.size(); char_idx++) {
-            if (char_idx != owner && collidesWith(characters[char_idx])) {
-                return true;
-            }
+        if (collisionManager.collidesWithAnyCharacter((int) x, (int) y, owner)) {
+            return true;
         }
     }
 
@@ -25,16 +23,6 @@ bool Bullet::update(const SDL_Surface *front, bool &updated, vector<Character> &
     return false;
 }
 
-bool Bullet::collidesWith(Character &character) const {
-    auto dx = (int) (character.getX() + 8 - x);
-    auto dy = (int) (character.getY() + 8 - y);
-    if (dx * dx + dy * dy <= 12 * 12) {
-        character.hurt(1);
-        return true;
-    } else {
-        return false;
-    }
-}
 
 double Bullet::getX() const {
     return x;

@@ -31,6 +31,8 @@ public:
 
     void setRope(bool rope);
 
+    [[nodiscard]] int getMovementType() const;
+
 private:
     bool up = false;
     bool down = false;

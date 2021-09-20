@@ -1,22 +1,15 @@
 #include <cmath>
 #include "Character.h"
 
-void Character::update(const SDL_Surface *front, list<Bullet> &bullets) {
-    int movementType = getMovementType();
-
-    if (keyStatus.isFire() && movementType != 5) {
-        fireBullet(bullets, movementType);
-    }
-
+void Character::update(const SDL_Surface *front) {
     ay = 5;
     ax = 0;
 
     if (!usingRope) {
-        movementLogic(front, movementType);
+        movementLogic(front, keyStatus.getMovementType());
     } else {
         ropeLogic(front);
     }
-
 
     double tx = x;
     double ty = y;
@@ -94,11 +87,11 @@ void Character::movementLogic(const SDL_Surface *front, int movementType) {
 void Character::ropeLogic(const SDL_Surface *front) {
     if (keyStatus.isDown()) {
         ropeLen += 2.0;
-        changedRope = +2.0;
+        changedRope = +2;
     }
     if (keyStatus.isUp()) {
         ropeLen -= 2.0;
-        changedRope = -2.0;
+        changedRope = -2;
     }
 
     if (ropeLen < 10.0) ropeLen = 10.0;
@@ -112,22 +105,6 @@ void Character::ropeLogic(const SDL_Surface *front) {
 
     if (!keyStatus.isRope() || !(getPixel(front, (int) ropeX, (int) ropeY) & 0xFF000000))
         usingRope = false;
-}
-
-void Character::fireBullet(list<Bullet> &bullets, int movementType) const {
-    double vy = 0.0;
-    if (movementType == 1 || movementType == 2 || movementType == 3) vy = -10.0;
-    if (movementType == 7 || movementType == 8 || movementType == 9) vy = +10.0;
-
-    double vx = 0.0;
-    if (movementType == 1 || movementType == 4 || movementType == 7) vx = -10.0;
-    if (movementType == 3 || movementType == 6 || movementType == 9) vx = +10.0;
-
-    double gx_new = x + 8.0 + vx * 0.6;
-    double gy_new = y + 8.0 + vy * 0.6;
-
-    Bullet b(gx_new, gy_new, vx, vy, id);
-    bullets.push_back(b);
 }
 
 void Character::throwRope(const SDL_Surface *front, int movementType) {
@@ -171,6 +148,10 @@ int Character::getHp() const {
     return hp;
 }
 
+int Character::getId() const {
+    return id;
+}
+
 double Character::getRopeX() const {
     return ropeX;
 }
@@ -212,20 +193,4 @@ double Character::getAngle(int idx) const {
         return 45;
     }
     return 0;
-}
-
-int Character::getMovementType() const {
-
-    if (keyStatus.isUp() && keyStatus.isLeft()) return 1;
-    if (keyStatus.isUp() && !keyStatus.isLeft() && !keyStatus.isRight()) return 2;
-    if (keyStatus.isUp() && keyStatus.isRight()) return 3;
-
-    if (!keyStatus.isUp() && !keyStatus.isDown() && keyStatus.isLeft()) return 4;
-    if (!keyStatus.isUp() && !keyStatus.isDown() && keyStatus.isRight()) return 6;
-
-    if (keyStatus.isDown() && keyStatus.isLeft()) return 7;
-    if (keyStatus.isDown() && !keyStatus.isLeft() && !keyStatus.isRight()) return 8;
-    if (keyStatus.isDown() && keyStatus.isRight()) return 9;
-
-    return 5;
 }

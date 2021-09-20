@@ -2,18 +2,19 @@
 #define BULLET_H
 
 #include "graphics.h"
-#include "Character.h"
+#include "CollisionManager.h"
 #include <vector>
-
-class Character;
 
 using namespace std;
 
 class Bullet {
 public:
-    Bullet(double x, double y, double vx, double vy, int ow) : x(x), y(y), vx(vx), vy(vy), owner(ow) {}
+    Bullet(double x, double y, double vx, double vy, int ow, CollisionManager &collisionManager) : x(x), y(y), vx(vx),
+                                                                                                   vy(vy), owner(ow),
+                                                                                                   collisionManager(
+                                                                                                           collisionManager) {}
 
-    bool update(const SDL_Surface *front, bool &updated, vector<Character> &characters);
+    bool update(const SDL_Surface *front, bool &updated);
 
     [[nodiscard]] double getX() const;
 
@@ -25,8 +26,7 @@ private:
     double vx;
     double vy;
     int owner;
-
-    bool collidesWith(Character &character) const;
+    CollisionManager &collisionManager;
 };
 
 #endif

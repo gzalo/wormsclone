@@ -2,20 +2,17 @@
 #define CHARACTER_H
 
 #include "graphics.h"
-#include "Bullet.h"
 #include "KeyStatus.h"
 #include <list>
 
 using namespace std;
-
-class Bullet;
 
 class Character {
 
 public:
     explicit Character(int id) : id(id) {}
 
-    void update(const SDL_Surface *front, list <Bullet> &bullets);
+    void update(const SDL_Surface *front);
 
     void hurt(int damage);
 
@@ -24,6 +21,8 @@ public:
     [[nodiscard]] double getY() const;
 
     [[nodiscard]] int getHp() const;
+
+    [[nodiscard]] int getId() const;
 
     [[nodiscard]] double getRopeX() const;
 
@@ -50,11 +49,7 @@ private:
 
     [[nodiscard]] double getAngle(int idx) const;
 
-    [[nodiscard]] int getMovementType() const;
-
     void throwRope(const SDL_Surface *front, int movementType);
-
-    void fireBullet(list <Bullet> &bullets, int movementType) const;
 
     void ropeLogic(const SDL_Surface *front);
 

@@ -31,7 +31,8 @@ void Game::run() {
         if (xoff < -front->w + width) xoff = -front->w + width;
 
         for (auto &character : characters) {
-            character.update(front, bullets);
+            character.update(front);
+            fireBullets(character);
         }
 
         drawRect(backgroundImgId, (int) (xoff / 2.0), 0, 2048, 1024);
@@ -60,9 +61,31 @@ void Game::run() {
 
 }
 
+void Game::fireBullets(Character &character) {
+    int movementType = character.getKeyStatus().getMovementType();
+    if (!character.getKeyStatus().isFire() || movementType == 5) {
+        return;
+    }
+
+    double vx = 0.0;
+    double vy = 0.0;
+
+    if (movementType == 1 || movementType == 4 || movementType == 7) vx = -10.0;
+    if (movementType == 3 || movementType == 6 || movementType == 9) vx = +10.0;
+    if (movementType == 1 || movementType == 2 || movementType == 3) vy = -10.0;
+    if (movementType == 7 || movementType == 8 || movementType == 9) vy = +10.0;
+
+    double gx_new = character.getX() + 8.0 + vx * 0.6;
+    double gy_new = character.getY() + 8.0 + vy * 0.6;
+
+    Bullet b(gx_new, gy_new, vx, vy, character.getId(), collisionManager);
+    bullets.push_back(b);
+}
+
+
 void Game::updateBullets() {
     for (auto it = bullets.begin(); it != bullets.end(); it++) {
-        bool remove = (*it).update(front, frontImgNeedsUpdate, characters);
+        bool remove = (*it).update(front, frontImgNeedsUpdate);
         if (remove) {
             it = bullets.erase(it);
         } else {
@@ -192,12 +215,12 @@ Game::Game(const int width, const int height, const int charCount) : width(width
     glEnable(GL_TEXTURE_2D);
     glLineWidth(2);
 
-    auto[front, frontImgId] = loadImage("res/escenario.png");
+    auto[front, frontImgId] = loadImage("res/front.png");
     Game::front = front;
     Game::frontImgId = frontImgId;
-    wormImgId = get<1>(loadImage("res/gusano.png"));
-    bulletImgId = get<1>(loadImage("res/bala.png"));
-    backgroundImgId = get<1>(loadImage("res/fondo.png"));
+    wormImgId = get<1>(loadImage("res/worm.png"));
+    bulletImgId = get<1>(loadImage("res/bullet.png"));
+    backgroundImgId = get<1>(loadImage("res/background.png"));
 
     for (int i = 0; i < charCount; i++) {
         characters.emplace_back(i);
