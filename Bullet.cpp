@@ -1,12 +1,7 @@
 #include "Bullet.h"
 
-inline float gabs(float x) {
-    if (x < 0) return -x;
-    return x;
-}
-
 bool Bullet::update(const SDL_Surface *front, bool &updated, vector<Character> &characters) {
-    auto steps = (int) max(gabs(vx), gabs(vy));
+    auto steps = (int) max(abs(vx), abs(vy));
 
     for (int i = 0; i < steps; i++) {
 
@@ -31,20 +26,20 @@ bool Bullet::update(const SDL_Surface *front, bool &updated, vector<Character> &
 }
 
 bool Bullet::collidesWith(Character &character) const {
-    auto dx = (int) (character.gx + 8 - x);
-    auto dy = (int) (character.gy + 8 - y);
+    auto dx = (int) (character.getX() + 8 - x);
+    auto dy = (int) (character.getY() + 8 - y);
     if (dx * dx + dy * dy <= 12 * 12) {
-        character.hp--;
+        character.hurt(1);
         return true;
     } else {
         return false;
     }
 }
 
-float Bullet::getX() const {
+double Bullet::getX() const {
     return x;
 }
 
-float Bullet::getY() const {
+double Bullet::getY() const {
     return y;
 }

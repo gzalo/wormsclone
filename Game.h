@@ -7,6 +7,7 @@
 #include <list>
 #include <vector>
 #include <map>
+
 using namespace std;
 
 class Game {
@@ -18,28 +19,30 @@ public:
 
 private:
     bool frontImgNeedsUpdate = true;
-    map <int, SDL_Surface*> surfaces;
-    list <Bullet> balas;
-    vector <Character> personajes;
-    bool mov = false;
+    list <Bullet> bullets;
+    vector<Character> characters;
     const SDL_Surface *front;
     const int width;
-    const int height;
     SDL_Window *window;
     GLuint frontImgId;
-    GLuint gusanoImgId;
-    GLuint balaImgId;
-    GLuint fondoImgId;
+    GLuint wormImgId;
+    GLuint bulletImgId;
+    GLuint backgroundImgId;
+    bool quit = false;
+    int mcam = 0;
+    int xoff = 0;
 
     bool handleKeyDown(const SDL_Event &event);
 
     void handleKeyUp(const SDL_Event &event);
 
-    int handleMouseMotion(const SDL_Event &event);
+    [[nodiscard]] int handleMouseMotion(const SDL_Event &event) const;
 
     void updateTitle();
 
-    void drawCharacter(const Character &personaje) const;
+    void drawCharacter(const Character &character) const;
+
+    void updateBullets();
 };
 
 #endif
