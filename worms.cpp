@@ -1,11 +1,13 @@
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
+#include <SDL2/SDL.h>
 #include <GL/gl.h>
 #include <string>
 #include <list>
 #include <vector>
 #include <map>
 #include <cmath>
+#include <cstring>
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 using namespace std;
 
 const int SCREEN_WIDTH=800;
@@ -31,7 +33,25 @@ int getNextPowerOfTwo(int val){
 
 int loadImage(const string &filename){
 	GLuint imgId;
-	SDL_Surface *loadedImage = IMG_Load(filename.c_str()); 
+
+    int req_format = STBI_rgb_alpha;
+    int width,height,orig_format;
+    unsigned char *data = stbi_load(filename.c_str(), &width, &height, &orig_format, req_format);
+
+    int depth, pitch;
+    Uint32 pixel_format;
+    if (req_format == STBI_rgb) {
+        depth = 24;
+        pitch = 3*width; // 3 bytes per pixel * pixels per row
+        pixel_format = SDL_PIXELFORMAT_RGB24;
+    } else { // STBI_rgb_alpha (RGBA)
+        depth = 32;
+        pitch = 4*width;
+        pixel_format = SDL_PIXELFORMAT_RGBA32;
+    }
+
+    SDL_Surface* loadedImage = SDL_CreateRGBSurfaceWithFormatFrom((void*)data, width, height,
+                                                           depth, pitch, pixel_format);
 	glGenTextures(1, &imgId);
 	glBindTexture(GL_TEXTURE_2D, imgId);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -558,17 +578,20 @@ void personaje::update(){
 }
 
 int main(int argc, char** args){
-	
 	SDL_Init(SDL_INIT_EVERYTHING);
-	putenv("SDL_VIDEO_WINDOW_POS=100,100") ;
-	
+
 	SDL_Joystick *joy0 = SDL_JoystickOpen(0);
 	SDL_Joystick *joy1 = SDL_JoystickOpen(1);
 	SDL_Joystick *joy2 = SDL_JoystickOpen(2);
 	
-	SDL_SetVideoMode(SCREEN_WIDTH,SCREEN_HEIGHT,SCREEN_BPP, SDL_OPENGL | SDL_HWSURFACE);
-	SDL_WM_SetCaption("GZWorms",NULL);
-	
+    SDL_Window *window = SDL_CreateWindow("WormsClone",
+                     SDL_WINDOWPOS_CENTERED,
+                    SDL_WINDOWPOS_CENTERED,
+                     SCREEN_WIDTH, SCREEN_HEIGHT,
+                     SDL_WINDOW_OPENGL);
+
+    SDL_GLContext context = SDL_GL_CreateContext(window);
+
 	glViewport(0,0,SCREEN_WIDTH,SCREEN_HEIGHT);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -579,7 +602,7 @@ int main(int argc, char** args){
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glClearColor(0.9, 0.9, 0.9, 0.1f);
+	glClearColor(0.9f, 0.9f, 0.9f, 0.1f);
 	glEnable(GL_TEXTURE_2D);
 	glLineWidth(2);
 	
@@ -591,7 +614,7 @@ int main(int argc, char** args){
 	fondoImg = loadImage("res/fondo.png");
 	
 	SDL_Event event;
-	
+
 	bool quit=false;
 	int mouseDown = 0;
 	int mcam = 0, xoff = 0;
@@ -740,13 +763,14 @@ int main(int argc, char** args){
 		
 		char buff[128];
 		sprintf(buff, "%.3d %.3d %.3d %.3d", personajes[0].hp, personajes[1].hp, personajes[2].hp, personajes[3].hp);
-		SDL_WM_SetCaption(buff, NULL);
+		SDL_SetWindowTitle(window, buff);
 		
-		SDL_GL_SwapBuffers();
+		SDL_GL_SwapWindow(window);
 		SDL_Delay(1000/60);		
 	}
 	
 	SDL_Quit();
+	return 0;
 }
 
 
