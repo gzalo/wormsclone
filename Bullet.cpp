@@ -5,21 +5,22 @@ bool Bullet::update(const SDL_Surface *front, bool &updated) {
 
     for (int i = 0; i < steps; i++) {
 
-        x += vx / (float) steps;
-        y += vy / (float) steps;
+        x += vx / (double) steps;
+        y += vy / (double) steps;
 
-        if (getPixel(front, (int) (x + 4.0), (int) (y + 4.0)) & 0xFF000000) {
-            filledCircleColor(front, (Sint16) (x + 4.0), (Sint16) (y + 4.0), 16, 0xFFFFFF00);
+        if (getPixel(front, (int) (x + width / 2), (int) (y + height / 2)) & 0xFF000000) {
+            filledCircleColor(front, (Sint16) (x + width / 2), (Sint16) (y + height / 2), (Sint16) EXPLOSION_RADIUS,
+                              0xFFFFFF00);
             updated = true;
             return true;
         }
 
-        if (collisionManager.collidesWithAnyCharacter((int) x, (int) y, owner)) {
+        if (collisionManager.collidesWithAnyCharacter(x, y, max(width, height) / 2, owner)) {
             return true;
         }
     }
 
-    if (y > 600) return true;
+    if (y > front->h) return true;
     return false;
 }
 

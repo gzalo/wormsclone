@@ -1,14 +1,15 @@
 #include "CollisionManager.h"
 
-bool CollisionManager::collidesWith(int x, int y, const Character &character) const {
-    auto dx = (int) (character.getX() + 8 - x);
-    auto dy = (int) (character.getY() + 8 - y);
-    return dx * dx + dy * dy <= 12 * 12;
+bool CollisionManager::collidesWith(double x, double y, double rad, const Character &character) const {
+    auto dx = character.getX() + character.getWidth() / 2 - x;
+    auto dy = character.getY() + character.getHeight() / 2 - y;
+    double maxRad = max(character.getWidth() / 2, character.getHeight() / 2) + rad;
+    return dx * dx + dy * dy <= maxRad * maxRad;
 }
 
-bool CollisionManager::collidesWithAnyCharacter(int x, int y, int owner) const {
+bool CollisionManager::collidesWithAnyCharacter(double x, double y, double rad, int owner) const {
     for (Character &character: characters) {
-        if (character.getId() != owner && collidesWith(x, y, character)) {
+        if (character.getId() != owner && collidesWith(x, y, rad, character)) {
             character.hurt(1);
             return true;
         }

@@ -8,9 +8,9 @@ using namespace std;
 
 class CollisionManager {
 public:
-    [[nodiscard]] bool collidesWith(int x, int y, const Character &character) const;
+    [[nodiscard]] bool collidesWith(double x, double y, double rad, const Character &character) const;
 
-    [[nodiscard]] bool collidesWithAnyCharacter(int x, int y, int owner) const;
+    [[nodiscard]] bool collidesWithAnyCharacter(double x, double y, double rad, int owner) const;
 
     explicit CollisionManager(vector<Character> &characters) : characters(characters) {}
 

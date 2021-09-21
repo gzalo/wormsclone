@@ -24,21 +24,29 @@ private:
     vector<Character> characters;
     CollisionManager collisionManager = CollisionManager(characters);
     const SDL_Surface *front;
+    const SDL_Surface *background;
+    const SDL_Surface *bullet;
+    const SDL_Surface *worm;
     const int width;
+    const int height;
     SDL_Window *window;
     GLuint frontImgId;
     GLuint wormImgId;
     GLuint bulletImgId;
     GLuint backgroundImgId;
     bool quit = false;
-    int mcam = 0;
+    int mcamX = 0;
+    int mcamY = 0;
     int xoff = 0;
+    int yoff = 0;
 
     bool handleKeyDown(const SDL_Event &event);
 
     void handleKeyUp(const SDL_Event &event);
 
-    [[nodiscard]] int handleMouseMotion(const SDL_Event &event) const;
+    [[nodiscard]] int handleMouseMotionX(const SDL_Event &event) const;
+
+    [[nodiscard]] int handleMouseMotionY(const SDL_Event &event) const;
 
     void updateTitle();
 
@@ -47,6 +55,10 @@ private:
     void updateBullets();
 
     void fireBullets(Character &character);
+
+    const int SCROLL_FACTOR = 10;
+    const int SCROLL_WINDOW = 150;
+    const float ROPE_WIDTH = 3.0f;
 };
 
 #endif

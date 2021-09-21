@@ -10,7 +10,7 @@ using namespace std;
 class Character {
 
 public:
-    explicit Character(int id) : id(id) {}
+    explicit Character(int id, double width, double height) : id(id), width(width), height(height) {}
 
     void update(const SDL_Surface *front);
 
@@ -27,6 +27,10 @@ public:
     [[nodiscard]] double getRopeX() const;
 
     [[nodiscard]] double getRopeY() const;
+
+    [[nodiscard]] double getWidth() const;
+
+    [[nodiscard]] double getHeight() const;
 
     KeyStatus &getKeyStatus();
 
@@ -46,6 +50,11 @@ private:
     double ropeLen = 0;
     int hp = 100;
     int changedRope = 0;
+    const double width;
+    const double height;
+
+    const double MIN_ROPE_LENGTH = 10.0;
+    const double MAX_ROPE_LENGTH = 500.0;
 
     [[nodiscard]] double getAngle(int idx) const;
 

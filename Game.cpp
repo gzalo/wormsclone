@@ -22,28 +22,32 @@ void Game::run() {
             }
 
             if (event.type == SDL_MOUSEMOTION) {
-                mcam = handleMouseMotion(event);
+                mcamX = handleMouseMotionX(event);
+                mcamY = handleMouseMotionY(event);
             }
         }
 
-        xoff -= mcam;
+        xoff -= mcamX;
+        yoff -= mcamY;
         if (xoff > 0) xoff = 0;
         if (xoff < -front->w + width) xoff = -front->w + width;
+        if (yoff > 0) yoff = 0;
+        if (yoff < -front->h + height) yoff = -front->h + height;
 
         for (auto &character : characters) {
             character.update(front);
             fireBullets(character);
         }
 
-        drawRect(backgroundImgId, (int) (xoff / 2.0), 0, 2048, 1024);
+        drawRect(backgroundImgId, (int) (xoff / 2.0), (int) (yoff / 2.0), background->w, background->h);
 
-        glTranslated(xoff, 0, 0);
+        glTranslated(xoff, yoff, 0);
 
         if (frontImgNeedsUpdate) {
             updateImage(frontImgId, front);
             frontImgNeedsUpdate = false;
         }
-        drawRect(frontImgId, 0, 0, 1200, 600);
+        drawRect(frontImgId, 0, 0, front->w, front->h);
 
         for (auto const &character : characters) {
             drawCharacter(character);
@@ -70,15 +74,15 @@ void Game::fireBullets(Character &character) {
     double vx = 0.0;
     double vy = 0.0;
 
-    if (movementType == 1 || movementType == 4 || movementType == 7) vx = -10.0;
-    if (movementType == 3 || movementType == 6 || movementType == 9) vx = +10.0;
-    if (movementType == 1 || movementType == 2 || movementType == 3) vy = -10.0;
-    if (movementType == 7 || movementType == 8 || movementType == 9) vy = +10.0;
+    if (movementType == 1 || movementType == 4 || movementType == 7) vx = -20.0;
+    if (movementType == 3 || movementType == 6 || movementType == 9) vx = +20.0;
+    if (movementType == 1 || movementType == 2 || movementType == 3) vy = -20.0;
+    if (movementType == 7 || movementType == 8 || movementType == 9) vy = +20.0;
 
-    double gx_new = character.getX() + 8.0 + vx * 0.6;
-    double gy_new = character.getY() + 8.0 + vy * 0.6;
+    double gx_new = character.getX() + worm->w / 2 + vx * 0.6;
+    double gy_new = character.getY() + worm->h / 2 + vy * 0.6;
 
-    Bullet b(gx_new, gy_new, vx, vy, character.getId(), collisionManager);
+    Bullet b(gx_new, gy_new, vx, vy, character.getId(), bullet->w, bullet->h, collisionManager);
     bullets.push_back(b);
 }
 
@@ -89,7 +93,8 @@ void Game::updateBullets() {
         if (remove) {
             it = bullets.erase(it);
         } else {
-            drawRect(bulletImgId, (int) (*it).getX() - 4, (int) (*it).getY() - 4, 8, 8);
+            drawRect(bulletImgId, (int) (*it).getX() - bullet->w / 2, (int) (*it).getY() - bullet->h / 2, bullet->w,
+                     bullet->h);
         }
     }
 }
@@ -101,14 +106,14 @@ void Game::drawCharacter(const Character &character) const {
             glColor4d(0.0, 0.0, 0.0, 1.0);
 
             glBegin(GL_LINES);
-            glVertex3d(character.getX() + 8, character.getY() + 8, 0);
+            glVertex3d(character.getX() + worm->w / 2, character.getY() + worm->h / 2, 0);
             glVertex3d(character.getRopeX(), character.getRopeY(), 0);
             glEnd();
 
             glColor4d(1.0, 1.0, 1.0, 1.0);
             glEnable(GL_TEXTURE_2D);
         }
-        drawRect(wormImgId, (int) character.getX(), (int) character.getY(), 16, 16);
+        drawRect(wormImgId, (int) character.getX(), (int) character.getY(), worm->w, worm->h);
     }
 }
 
@@ -119,11 +124,21 @@ void Game::updateTitle() {
     SDL_SetWindowTitle(window, buff.str().c_str());
 }
 
-int Game::handleMouseMotion(const SDL_Event &event) const {
-    if (event.motion.x > 700) {
-        return (event.motion.x - 700) / 10;
-    } else if (event.motion.x < 100) {
-        return -(100 - event.motion.x) / 10;
+int Game::handleMouseMotionX(const SDL_Event &event) const {
+    if (event.motion.x > width - SCROLL_WINDOW) {
+        return (event.motion.x - (width - SCROLL_WINDOW)) / SCROLL_FACTOR;
+    } else if (event.motion.x < SCROLL_WINDOW) {
+        return -(SCROLL_WINDOW - event.motion.x) / SCROLL_FACTOR;
+    } else {
+        return 0;
+    }
+}
+
+int Game::handleMouseMotionY(const SDL_Event &event) const {
+    if (event.motion.y > height - SCROLL_WINDOW) {
+        return (event.motion.y - (height - SCROLL_WINDOW)) / SCROLL_FACTOR;
+    } else if (event.motion.y < SCROLL_WINDOW) {
+        return -(SCROLL_WINDOW - event.motion.y) / SCROLL_FACTOR;
     } else {
         return 0;
     }
@@ -190,7 +205,7 @@ bool Game::handleKeyDown(const SDL_Event &event) {
     return false;
 }
 
-Game::Game(const int width, const int height, const int charCount) : width(width) {
+Game::Game(const int width, const int height, const int charCount) : width(width), height(height) {
     SDL_Init(SDL_INIT_EVERYTHING);
 
     window = SDL_CreateWindow("WormsClone",
@@ -208,21 +223,31 @@ Game::Game(const int width, const int height, const int charCount) : width(width
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glColor4d(1.0, 1.0, 1.0, 1.0);
+    glEnable(GL_LINE_SMOOTH);
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glClearColor(0.9f, 0.9f, 0.9f, 0.1f);
     glEnable(GL_TEXTURE_2D);
-    glLineWidth(2);
+    glLineWidth(ROPE_WIDTH);
 
     auto[front, frontImgId] = loadImage("res/front.png");
     Game::front = front;
     Game::frontImgId = frontImgId;
-    wormImgId = get<1>(loadImage("res/worm.png"));
-    bulletImgId = get<1>(loadImage("res/bullet.png"));
-    backgroundImgId = get<1>(loadImage("res/background.png"));
+
+    auto[worm, wormImgId] = loadImage("res/worm.png");
+    Game::worm = worm;
+    Game::wormImgId = wormImgId;
+
+    auto[bullet, bulletImgId] = loadImage("res/bullet.png");
+    Game::bullet = bullet;
+    Game::bulletImgId = bulletImgId;
+
+    auto[background, backgroundImgId] = loadImage("res/background.png");
+    Game::background = background;
+    Game::backgroundImgId = backgroundImgId;
 
     for (int i = 0; i < charCount; i++) {
-        characters.emplace_back(i);
+        characters.emplace_back(i, worm->w, worm->h);
     }
 }
