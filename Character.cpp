@@ -21,24 +21,24 @@ void Character::update(const SDL_Surface *front) {
 
     int press = 0;
 
-    while (getPixel(front, (int) x - 1, (int) y + height / 2) & 0xFF000000) {
+    while (getPixel(front, (int) (x - 1.0), (int) (y + height / 2.0)) & 0xFF000000) {
         x++;
         ox = x;
         press++;
     }
-    while (getPixel(front, (int) x + width, (int) y + height / 2) & 0xFF000000) {
+    while (getPixel(front, (int) (x + width), (int) (y + height / 2.0)) & 0xFF000000) {
         x--;
         ox = x;
         press++;
     }
 
-    while (getPixel(front, (int) x + width / 2, (int) y + height) & 0xFF000000) {
+    while (getPixel(front, (int) (x + width / 2.0), (int) (y + height)) & 0xFF000000) {
         y--;
         oy = y;
         jumping = false;
         press++;
     }
-    while (getPixel(front, (int) x + width / 2, (int) y - 1) & 0xFF000000) {
+    while (getPixel(front, (int) (x + width / 2.0), (int) (y - 1.0)) & 0xFF000000) {
         y++;
         oy = y;
         jumping = true;
@@ -66,7 +66,7 @@ void Character::movementLogic(const SDL_Surface *front, int movementType) {
         ax += 10;
     }
 
-    if (getPixel(front, (int) x + width / 2, (int) y + height + 1) & 0xFF000000) {
+    if (getPixel(front, (int) (x + width / 2.0), (int) (y + height + 1.0)) & 0xFF000000) {
         if (x - ox > 0) {
             ax -= 8;
         } else if (x - ox < 0) {

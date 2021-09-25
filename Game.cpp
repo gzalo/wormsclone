@@ -27,12 +27,7 @@ void Game::run() {
             }
         }
 
-        xoff -= mcamX;
-        yoff -= mcamY;
-        if (xoff > 0) xoff = 0;
-        if (xoff < -front->w + width) xoff = -front->w + width;
-        if (yoff > 0) yoff = 0;
-        if (yoff < -front->h + height) yoff = -front->h + height;
+        handleCameraMovement();
 
         for (auto &character : characters) {
             character.update(front);
@@ -63,6 +58,15 @@ void Game::run() {
 
     SDL_Quit();
 
+}
+
+void Game::handleCameraMovement() {
+    xoff -= mcamX;
+    yoff -= mcamY;
+    if (xoff > 0) xoff = 0;
+    if (xoff < -front->w + width) xoff = -front->w + width;
+    if (yoff > 0) yoff = 0;
+    if (yoff < -front->h + height) yoff = -front->h + height;
 }
 
 void Game::fireBullets(Character &character) {

@@ -9,9 +9,9 @@ using namespace std;
 
 class Bullet {
 public:
-    Bullet(double x, double y, double vx, double vy, int ow, double width, double height,
+    Bullet(double x, double y, double vx, double vy, int owner, double width, double height,
            CollisionManager &collisionManager) : x(x), y(y), vx(vx),
-                                                 vy(vy), owner(ow),
+                                                 vy(vy), owner(owner),
                                                  width(width), height(height),
                                                  collisionManager(
                                                          collisionManager) {}

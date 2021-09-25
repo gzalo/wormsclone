@@ -59,6 +59,8 @@ private:
     const int SCROLL_FACTOR = 10;
     const int SCROLL_WINDOW = 150;
     const float ROPE_WIDTH = 3.0f;
+
+    void handleCameraMovement();
 };
 
 #endif
